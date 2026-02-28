@@ -1,9 +1,7 @@
 package com.mipt.popikovdmitriy.controller;
 
-import com.mipt.popikovdmitriy.dto.CreateTaskRequest;
-import com.mipt.popikovdmitriy.model.Task;
-import com.mipt.popikovdmitriy.service.TaskService;
 import java.util.List;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -15,8 +13,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.mipt.popikovdmitriy.dto.CreateTaskRequest;
+import com.mipt.popikovdmitriy.model.Task;
+import com.mipt.popikovdmitriy.service.TaskService;
+
 @RestController
-@RequestMapping("/tasks")
+@RequestMapping("/api/tasks")
 public class TaskController {
 
     private final TaskService taskService;

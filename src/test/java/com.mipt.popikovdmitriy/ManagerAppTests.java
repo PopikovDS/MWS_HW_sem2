@@ -1,13 +1,27 @@
 package com.mipt.popikovdmitriy;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+
+import com.mipt.popikovdmitriy.service.AppInfoService;
 
 @SpringBootTest
 class TodoListManagerApplicationTests {
 
+    @Autowired
+    private AppInfoService appInfoService;
+
     @Test
     void contextLoads() {
+        assertNotNull(appInfoService);
     }
 
+    @Test
+    void customPropertiesAreInjected() {
+        assertEquals("Todo List Manager", appInfoService.getAppName());
+        assertEquals("1.0.0", appInfoService.getAppVersion());
+    }
 }
