@@ -1,11 +1,5 @@
 package com.mipt.popikovdmitriy.service;
 
-import com.mipt.popikovdmitriy.exception.InvalidTaskException;
-import com.mipt.popikovdmitriy.exception.TaskNotFoundException;
-import com.mipt.popikovdmitriy.model.Task;
-import com.mipt.popikovdmitriy.repository.TaskRepository;
-import jakarta.annotation.PostConstruct;
-import jakarta.annotation.PreDestroy;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -16,10 +10,39 @@ import java.time.Instant;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import com.mipt.popikovdmitriy.exception.InvalidTaskException;
+import com.mipt.popikovdmitriy.exception.TaskNotFoundException;
+import com.mipt.popikovdmitriy.model.Task;
+import com.mipt.popikovdmitriy.repository.TaskRepository;
+
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
+
+/**
+ * Core service encapsulating business logic for task management.
+ *
+ * <p>
+ * Delegates persistence to a
+ * {@link com.mipt.popikovdmitriy.repository.TaskRepository} and maintains an
+ * in-memory cache ({@link java.util.LinkedHashMap}) for fast lookups by task
+ * identifier.</p>
+ *
+ * <p>
+ * Lifecycle hooks:
+ * <ul>
+ * <li>{@link jakarta.annotation.PostConstruct @PostConstruct} — pre-populates
+ * the repository with sample data and warms the cache.</li>
+ * <li>{@link jakarta.annotation.PreDestroy @PreDestroy} — logs cache statistics
+ * and optionally persists them to a file before shutdown.</li>
+ * </ul>
+ *
+ * @see com.mipt.popikovdmitriy.repository.TaskRepository
+ */
 @Service
 public class TaskService {
 

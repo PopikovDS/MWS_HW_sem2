@@ -1,14 +1,28 @@
 package com.mipt.popikovdmitriy.repository;
 
-import com.mipt.popikovdmitriy.model.Task;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import org.springframework.beans.factory.annotation.Qualifier;
 
-@Qualifier("stubTaskRepository")
+import com.mipt.popikovdmitriy.model.Task;
+
+/**
+ * Read-only stub implementation of {@link TaskRepository} preloaded with sample
+ * data.
+ *
+ * <p>
+ * Intended for demonstration and testing purposes. Any mutating operations
+ * ({@code create}, {@code update}, {@code deleteById}) throw
+ * {@link UnsupportedOperationException}.</p>
+ *
+ * <p>
+ * Registered as a named bean ({@code "stubTaskRepository"}) via
+ * {@link com.mipt.popikovdmitriy.config.TaskRepositoryConfig @Configuration} so
+ * it can be explicitly injected alongside the primary repository using
+ * {@code @Qualifier("stubTaskRepository")}.</p>
+ */
 public class StubTaskRepository implements TaskRepository {
 
     private final List<Task> tasks;

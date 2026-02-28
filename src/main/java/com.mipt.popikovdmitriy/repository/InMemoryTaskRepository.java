@@ -1,16 +1,31 @@
 package com.mipt.popikovdmitriy.repository;
 
-import com.mipt.popikovdmitriy.exception.TaskNotFoundException;
-import com.mipt.popikovdmitriy.model.Task;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
+
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
 
+import com.mipt.popikovdmitriy.exception.TaskNotFoundException;
+import com.mipt.popikovdmitriy.model.Task;
+
+/**
+ * Primary {@link TaskRepository} implementation that stores tasks in memory
+ * using a {@link java.util.concurrent.ConcurrentHashMap}.
+ *
+ * <p>
+ * Thread-safe and suitable for the MVP stage where persistence is not required.
+ * An {@link java.util.concurrent.atomic.AtomicLong} sequence generator ensures
+ * unique task identifiers.</p>
+ *
+ * <p>
+ * Marked as {@link Primary @Primary} so that it is preferred over any other
+ * {@code TaskRepository} bean during autowiring.</p>
+ */
 @Primary
 @Repository
 public class InMemoryTaskRepository implements TaskRepository {

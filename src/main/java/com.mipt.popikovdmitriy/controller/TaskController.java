@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,7 +18,27 @@ import com.mipt.popikovdmitriy.dto.CreateTaskRequest;
 import com.mipt.popikovdmitriy.model.Task;
 import com.mipt.popikovdmitriy.service.TaskService;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
+
+/**
+ * REST controller that exposes CRUD endpoints for task management.
+ *
+ * <p>
+ * All request/response bodies are validated using Jakarta Bean Validation.
+ * Endpoints:
+ * <ul>
+ * <li>{@code POST   /api/tasks} — create a new task</li>
+ * <li>{@code GET    /api/tasks/{id}} — retrieve a task by its identifier</li>
+ * <li>{@code GET    /api/tasks} — list all tasks</li>
+ * <li>{@code PUT    /api/tasks/{id}} — update an existing task</li>
+ * <li>{@code DELETE /api/tasks/{id}} — delete a task</li>
+ * </ul>
+ *
+ * @see com.mipt.popikovdmitriy.service.TaskService
+ */
 @RestController
+@Validated
 @RequestMapping("/api/tasks")
 public class TaskController {
 
@@ -28,34 +49,35 @@ public class TaskController {
     }
 
     @PostMapping
-    public ResponseEntity<Task> createTask(@RequestBody CreateTaskRequest request) {
+    public ResponseEntity<Task> createTask(@RequestBody @Valid CreateTaskRequest request) {
         Task created = taskService.createTask(request.getTitle(),
                 request.getDescription(),
                 request.isCompleted());
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .header("Location", "/tasks/" + created.getId())
+                .header("Location", "/api/tasks/" + created.getId())
                 .body(created);
     }
 
     @GetMapping("/{id}")
-    public Task getTask(@PathVariable Long id) {
-        return taskService.getTaskById(id);
+    public ResponseEntity<Task> getTask(@PathVariable @Min(1) Long id) {
+        return ResponseEntity.ok(taskService.getTaskById(id));
     }
 
     @GetMapping
-    public List<Task> getAllTasks() {
-        return taskService.getAllTasks();
+    public ResponseEntity<List<Task>> getAllTasks() {
+        return ResponseEntity.ok(taskService.getAllTasks());
     }
 
     @PutMapping("/{id}")
-    public Task updateTask(@PathVariable Long id, @RequestBody Task task) {
-        return taskService.updateTask(id, task.getTitle(), task.getDescription(),
-                task.isCompleted());
+    public ResponseEntity<Task> updateTask(@PathVariable @Min(1) Long id, @RequestBody @Valid CreateTaskRequest update) {
+        return ResponseEntity.ok(
+                taskService.updateTask(id, update.getTitle(), update.getDescription(),
+                        update.isCompleted()));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteTask(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteTask(@PathVariable @Min(1) Long id) {
         taskService.deleteTaskById(id);
         return ResponseEntity.noContent().build();
     }

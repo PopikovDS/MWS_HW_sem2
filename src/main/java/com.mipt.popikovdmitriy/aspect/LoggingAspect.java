@@ -8,6 +8,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+/**
+ * Cross-cutting aspect that provides method-level logging for all service-layer
+ * beans.
+ *
+ * <p>
+ * Uses an {@code @Around} advice to log method entry, exit (including the
+ * return value), and any exceptions thrown by methods within the
+ * {@code com.mipt.popikovdmitriy.service} package.</p>
+ *
+ * @see org.aspectj.lang.annotation.Aspect
+ */
 @Aspect
 @Component
 public class LoggingAspect {
@@ -18,7 +29,7 @@ public class LoggingAspect {
      * Logs start/end of all methods in the service package. Also logs returned
      * value; for void methods logs "void".
      */
-    @Around("execution(* com.mipt.nikitabumagin.service..*(..))")
+    @Around("execution(* com.mipt.popikovdmitriy.service..*(..))")
     public Object logServiceMethods(ProceedingJoinPoint joinPoint) throws Throwable {
         String signature = joinPoint.getSignature().toShortString();
 
