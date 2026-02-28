@@ -27,6 +27,10 @@ public class TaskService {
     private final TaskRepository repository;
     private Map<Long, Task> taskCache;
 
+    public TaskService(TaskRepository repository) {
+        this.repository = repository;
+    }
+
     @PostConstruct
     public void initCache() {
         taskCache = new LinkedHashMap<>();

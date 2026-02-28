@@ -1,7 +1,5 @@
 package com.mipt.popikovdmitriy.processor;
 
-import com.mipt.popikovdmitriy.repository.TaskRepository;
-import com.mipt.popikovdmitriy.service.TaskService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
@@ -9,10 +7,13 @@ import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
+import com.mipt.popikovdmitriy.repository.TaskRepository;
+import com.mipt.popikovdmitriy.service.TaskService;
+
 @Component
 public class TaskLifeCycleProcessor implements BeanPostProcessor {
 
-    private static final Logger log = LoggerFactory.getLogger(TaskLifecycleProcessor.class);
+    private static final Logger log = LoggerFactory.getLogger(TaskLifeCycleProcessor.class);
 
     @Override
     public Object postProcessBeforeInitialization(@NonNull Object bean, @NonNull String beanName)
