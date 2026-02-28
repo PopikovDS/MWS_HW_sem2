@@ -4,6 +4,7 @@ git target/
 !**/src/test/**/target/
 
 ### IntelliJ IDEA ###
+.idea*
 .idea
 .idea/
 .idea/modules.xml
