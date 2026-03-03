@@ -21,20 +21,20 @@ class ScopeDemoControllerTest {
 
     @Test
     void requestScope_sameWithinSingleRequest() throws Exception {
-        mockMvc.perform(get("/api/scope/request"))
+        mockMvc.perform(get("/api/tasks/scope/request"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.sameInstanceWithinRequest", is(true)));
     }
 
     @Test
     void requestScope_newAcrossRequests() throws Exception {
-        String first = mockMvc.perform(get("/api/scope/request"))
+        String first = mockMvc.perform(get("/api/tasks/scope/request"))
                 .andExpect(status().isOk())
                 .andReturn()
                 .getResponse()
                 .getContentAsString();
 
-        String second = mockMvc.perform(get("/api/scope/request"))
+        String second = mockMvc.perform(get("/api/tasks/scope/request"))
                 .andExpect(status().isOk())
                 .andReturn()
                 .getResponse()
@@ -45,7 +45,7 @@ class ScopeDemoControllerTest {
 
     @Test
     void prototypeScope_alwaysDifferent() throws Exception {
-        mockMvc.perform(get("/api/scope/prototype"))
+        mockMvc.perform(get("/api/tasks/scope/prototype"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.differentInstances", is(true)))
                 .andExpect(jsonPath("$.instanceId1", not("")))
