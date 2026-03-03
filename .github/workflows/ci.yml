@@ -22,10 +22,10 @@ jobs:
           cache: maven
 
       - name: Build
-        run: ./mvnw clean compile -B
+        run: ./mvnw.cmd clean compile -B
 
       - name: Run tests
-        run: ./mvnw test -B
+        run: ./mvnw.cmd test -B
 
       - name: Upload test results
         if: always()
