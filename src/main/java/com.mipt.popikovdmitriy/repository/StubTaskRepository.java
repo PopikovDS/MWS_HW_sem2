@@ -69,3 +69,4 @@ public class StubTaskRepository implements TaskRepository {
         throw new UnsupportedOperationException("Stub repository is read-only");
     }
 }
+

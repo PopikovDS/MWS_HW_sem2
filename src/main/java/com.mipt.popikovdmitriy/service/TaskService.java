@@ -95,7 +95,7 @@ public class TaskService {
             writer.write(Instant.now() + " cacheSize=" + cacheSize);
             writer.newLine();
         } catch (IOException e) {
-            log.warn("Failed to write cache stats to {}: {}", out.toAbsolutePath(), e.getMessage());
+            log.error("Failed to write cache stats to {}: {}", out.toAbsolutePath(), e.getMessage());
         }
 
         if (taskCache != null) {
@@ -172,3 +172,4 @@ public class TaskService {
         }
     }
 }
+

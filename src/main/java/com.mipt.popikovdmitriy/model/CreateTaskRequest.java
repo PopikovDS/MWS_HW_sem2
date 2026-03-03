@@ -1,4 +1,4 @@
-package com.mipt.popikovdmitriy.dto;
+package com.mipt.popikovdmitriy.model;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -68,3 +68,4 @@ public class CreateTaskRequest {
         this.completed = completed;
     }
 }
+

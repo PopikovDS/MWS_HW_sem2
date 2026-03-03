@@ -13,8 +13,12 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.mipt.popikovdmitriy.dto.CreateTaskRequest;
+import java.time.Instant;
+import java.util.Map;
+import com.mipt.popikovdmitriy.scope.PrototypeScopedBean;
+import com.mipt.popikovdmitriy.scope.RequestScopedBean;
+import com.mipt.popikovdmitriy.service.PrototypeBeanService;
+import com.mipt.popikovdmitriy.model.CreateTaskRequest;
 import com.mipt.popikovdmitriy.model.Task;
 import com.mipt.popikovdmitriy.service.TaskService;
 
@@ -43,9 +47,15 @@ import jakarta.validation.constraints.Min;
 public class TaskController {
 
     private final TaskService taskService;
+    private final RequestScopedBean requestScopedBean;
+    private final PrototypeBeanService prototypeBeanService;
 
-    public TaskController(TaskService taskService) {
+    public TaskController(TaskService taskService,
+                          RequestScopedBean requestScopedBean,
+                          PrototypeBeanService prototypeBeanService) {
         this.taskService = taskService;
+        this.requestScopedBean = requestScopedBean;
+        this.prototypeBeanService = prototypeBeanService;
     }
 
     @PostMapping
@@ -80,5 +90,33 @@ public class TaskController {
     public ResponseEntity<Void> deleteTask(@PathVariable @Min(1) Long id) {
         taskService.deleteTaskById(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/scope/request")
+    public ResponseEntity<Map<String, Object>> requestScope() {
+        String id1 = requestScopedBean.getRequestId();
+        Instant startedAt1 = requestScopedBean.getStartedAt();
+
+        String id2 = requestScopedBean.getRequestId();
+        Instant startedAt2 = requestScopedBean.getStartedAt();
+
+        return ResponseEntity.ok(Map.of(
+                "requestId1", id1,
+                "requestId2", id2,
+                "sameInstanceWithinRequest", id1.equals(id2) && startedAt1.equals(startedAt2),
+                "startedAt", startedAt1.toString()));
+    }
+
+    @GetMapping("/scope/prototype")
+    public ResponseEntity<Map<String, Object>> prototypeScope() {
+        PrototypeScopedBean b1 = prototypeBeanService.newPrototypeBean();
+        PrototypeScopedBean b2 = prototypeBeanService.newPrototypeBean();
+
+        return ResponseEntity.ok(Map.of(
+                "instanceId1", b1.getInstanceId(),
+                "instanceId2", b2.getInstanceId(),
+                "taskId1", b1.newTaskId(),
+                "taskId2", b2.newTaskId(),
+                "differentInstances", !b1.getInstanceId().equals(b2.getInstanceId())));
     }
 }

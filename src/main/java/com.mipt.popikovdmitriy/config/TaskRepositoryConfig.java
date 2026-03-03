@@ -24,3 +24,4 @@ public class TaskRepositoryConfig {
         return new StubTaskRepository();
     }
 }
+

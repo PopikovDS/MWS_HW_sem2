@@ -54,3 +54,4 @@ public class TaskLifeCycleProcessor implements BeanPostProcessor {
         return (bean instanceof TaskService) || (bean instanceof TaskRepository);
     }
 }
+

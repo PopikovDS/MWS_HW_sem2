@@ -25,3 +25,4 @@ class TodoListManagerApplicationTests {
         assertEquals("1.0.0", appInfoService.getAppVersion());
     }
 }
+

@@ -40,3 +40,4 @@ public class PrototypeScopedBean {
         return instanceId;
     }
 }
+

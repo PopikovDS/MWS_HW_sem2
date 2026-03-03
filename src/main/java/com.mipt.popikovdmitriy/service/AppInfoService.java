@@ -37,3 +37,4 @@ public class AppInfoService {
         return appVersion;
     }
 }
+

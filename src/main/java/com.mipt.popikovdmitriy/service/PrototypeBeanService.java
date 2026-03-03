@@ -27,3 +27,4 @@ public class PrototypeBeanService {
         return prototypeScopedBeanProvider.getObject();
     }
 }
+
