@@ -7,6 +7,7 @@ on:
     branches: [ "**" ]
 
 jobs:
+
   build:
     runs-on: ubuntu-latest
 
@@ -21,11 +22,14 @@ jobs:
           distribution: 'temurin'
           cache: maven
 
+      - name: Give mvnw execute permission
+        run: chmod +x mvnw
+
       - name: Build
-        run: ./mvnw.cmd clean compile -B
+        run: ./mvnw clean compile -B
 
       - name: Run tests
-        run: ./mvnw.cmd test -B
+        run: ./mvnw test -B
 
       - name: Upload test results
         if: always()
