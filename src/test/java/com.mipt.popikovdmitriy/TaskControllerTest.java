@@ -16,7 +16,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import com.mipt.popikovdmitriy.dto.CreateTaskRequest;
+import com.mipt.popikovdmitriy.model.CreateTaskRequest;
 import com.mipt.popikovdmitriy.model.Task;
 
 /**
@@ -244,6 +244,7 @@ class TaskControllerTest {
                 "/api/tasks/" + id, HttpMethod.DELETE, null, String.class);
         assertEquals(HttpStatus.NOT_FOUND, second.getStatusCode());
     }
+
 
     @Test
     void statistics_returnsOkWithComparison() {
