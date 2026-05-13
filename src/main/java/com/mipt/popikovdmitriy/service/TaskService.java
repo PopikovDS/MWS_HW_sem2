@@ -22,15 +22,12 @@ import com.mipt.popikovdmitriy.repository.TaskRepository;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 
-/**
- * Core service encapsulating business logic for task management.
- */
 @Service
 public class TaskService {
 
   private static final Logger log = LoggerFactory.getLogger(TaskService.class);
   private final TaskRepository repository;
-  private LinkedHashMap<Long, Task> taskCache;
+  private final LinkedHashMap<Long, Task> taskCache = new LinkedHashMap<>();
 
   public TaskService(TaskRepository repository) {
     this.repository = repository;
@@ -38,7 +35,6 @@ public class TaskService {
 
   @PostConstruct
   public void initCache() {
-    taskCache = new LinkedHashMap<>();
     try {
       repository.create("Welcome", "First task created on startup", false);
       repository.create("Readme", "Check API endpoints in controller", false);
@@ -48,14 +44,9 @@ public class TaskService {
     }
 
     for (Task task : repository.findAll()) {
-      if (task == null) {
-        continue;
+      if (task != null && task.getId() != null) {
+        taskCache.put(task.getId(), task);
       }
-      if (task.getId() == null) {
-        log.warn("Skipping task without id during cache init: title='{}'", task.getTitle());
-        continue;
-      }
-      taskCache.put(task.getId(), task);
     }
 
     log.info("Task cache initialized: {} entries", taskCache.size());
@@ -63,28 +54,16 @@ public class TaskService {
 
   @PreDestroy
   public void clearCache() {
-    int cacheSize = (taskCache == null) ? 0 : taskCache.size();
-    log.info("Destroying TaskService. Cache size before destroy: {}", cacheSize);
-
+    log.info("Destroying TaskService. Cache size before destroy: {}", taskCache.size());
     Path out = Path.of("task-cache-stats.txt");
-    try (BufferedWriter writer = Files.newBufferedWriter(
-        out,
-        StandardCharsets.UTF_8,
-        StandardOpenOption.CREATE,
-        StandardOpenOption.APPEND)) {
-      writer.write(Instant.now() + " cacheSize=" + cacheSize);
+    try (BufferedWriter writer = Files.newBufferedWriter(out, StandardCharsets.UTF_8,
+        StandardOpenOption.CREATE, StandardOpenOption.APPEND)) {
+      writer.write(Instant.now() + " cacheSize=" + taskCache.size());
       writer.newLine();
     } catch (IOException e) {
       log.error("Failed to write cache stats to {}: {}", out.toAbsolutePath(), e.getMessage());
     }
-
-    if (taskCache != null) {
-      taskCache.clear();
-    }
-  }
-
-  public TaskRepository getRepository() {
-    return repository;
+    taskCache.clear();
   }
 
   public Task createTask(Task task) {
@@ -93,7 +72,7 @@ public class TaskService {
     }
     normalizeTaskForSave(task);
     Task created = repository.create(task.getTitle(), task.getDescription(), task.isCompleted());
-    if (created != null && created.getId() != null && taskCache != null) {
+    if (created != null && created.getId() != null) {
       taskCache.put(created.getId(), created);
     }
     return created;
@@ -103,17 +82,12 @@ public class TaskService {
     if (id == null) {
       throw new TaskNotFoundException(null);
     }
-    if (taskCache != null) {
-      Task cached = taskCache.get(id);
-      if (cached != null) {
-        return cached;
-      }
+    Task cached = taskCache.get(id);
+    if (cached != null) {
+      return cached;
     }
-    Task task = repository.findById(id)
-        .orElseThrow(() -> new TaskNotFoundException(id));
-    if (task.getId() != null && taskCache != null) {
-      taskCache.put(task.getId(), task);
-    }
+    Task task = repository.findById(id).orElseThrow(() -> new TaskNotFoundException(id));
+    taskCache.put(id, task);
     return task;
   }
 
@@ -127,19 +101,17 @@ public class TaskService {
     }
     normalizeTaskForSave(task);
     Task updated = repository.update(task);
-    if (updated != null && updated.getId() != null && taskCache != null) {
+    if (updated != null && updated.getId() != null) {
       taskCache.put(updated.getId(), updated);
     }
     return updated;
   }
 
   public void deleteTaskById(Long id) {
-    if (!repository.deleteById(id)) {
+    if (id == null || !repository.deleteById(id)) {
       throw new TaskNotFoundException(id);
     }
-    if (taskCache != null && id != null) {
-      taskCache.remove(id);
-    }
+    taskCache.remove(id);
   }
 
   private void normalizeTaskForSave(Task task) {
