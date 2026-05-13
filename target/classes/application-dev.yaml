@@ -1,0 +1,15 @@
+# Dev profile: verbose logging + convenient defaults
+spring:
+  config:
+    activate:
+      on-profile: dev
+
+server:
+  port: 8080
+
+logging:
+  level:
+    root: INFO
+    com.mipt.popikovdmitriy: DEBUG
+    org.springframework.web: DEBUG
+    org.springframework.boot.autoconfigure: INFO

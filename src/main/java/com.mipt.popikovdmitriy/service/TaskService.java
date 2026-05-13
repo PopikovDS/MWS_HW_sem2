@@ -9,7 +9,6 @@ import java.nio.file.StandardOpenOption;
 import java.time.Instant;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,30 +24,13 @@ import jakarta.annotation.PreDestroy;
 
 /**
  * Core service encapsulating business logic for task management.
- *
- * <p>
- * Delegates persistence to a
- * {@link com.mipt.popikovdmitriy.repository.TaskRepository} and maintains an
- * in-memory cache ({@link java.util.LinkedHashMap}) for fast lookups by task
- * identifier.</p>
- *
- * <p>
- * Lifecycle hooks:
- * <ul>
- * <li>{@link jakarta.annotation.PostConstruct @PostConstruct} — pre-populates
- * the repository with sample data and warms the cache.</li>
- * <li>{@link jakarta.annotation.PreDestroy @PreDestroy} — logs cache statistics
- * and optionally persists them to a file before shutdown.</li>
- * </ul>
- *
- * @see com.mipt.popikovdmitriy.repository.TaskRepository
  */
 @Service
 public class TaskService {
 
   private static final Logger log = LoggerFactory.getLogger(TaskService.class);
   private final TaskRepository repository;
-  private Map<Long, Task> taskCache;
+  private LinkedHashMap<Long, Task> taskCache;
 
   public TaskService(TaskRepository repository) {
     this.repository = repository;
@@ -84,8 +66,6 @@ public class TaskService {
     int cacheSize = (taskCache == null) ? 0 : taskCache.size();
     log.info("Destroying TaskService. Cache size before destroy: {}", cacheSize);
 
-    // Optional: persist simple shutdown stats.
-    // We write to working directory, so it won't require extra configuration.
     Path out = Path.of("task-cache-stats.txt");
     try (BufferedWriter writer = Files.newBufferedWriter(
         out,
@@ -107,9 +87,12 @@ public class TaskService {
     return repository;
   }
 
-  public Task createTask(String title, String description, Boolean completed) {
-    validateTaskFields(title, description, completed);
-    Task created = repository.create(title, description, completed);
+  public Task createTask(Task task) {
+    if (task == null) {
+      throw new InvalidTaskException("Task must not be null");
+    }
+    normalizeTaskForSave(task);
+    Task created = repository.create(task.getTitle(), task.getDescription(), task.isCompleted());
     if (created != null && created.getId() != null && taskCache != null) {
       taskCache.put(created.getId(), created);
     }
@@ -138,12 +121,11 @@ public class TaskService {
     return repository.findAll();
   }
 
-  public Task updateTask(Long id, String title, String description, Boolean completed) {
-    validateTaskFields(title, description, completed);
-    Task task = getTaskById(id);
-    task.setTitle(title);
-    task.setDescription(description);
-    task.setCompleted(completed);
+  public Task updateTask(Task task) {
+    if (task == null || task.getId() == null) {
+      throw new InvalidTaskException("Task id must be provided for update");
+    }
+    normalizeTaskForSave(task);
     Task updated = repository.update(task);
     if (updated != null && updated.getId() != null && taskCache != null) {
       taskCache.put(updated.getId(), updated);
@@ -160,15 +142,15 @@ public class TaskService {
     }
   }
 
-  private void validateTaskFields(String title, String description, Boolean completed) {
-    if (title == null || title.trim().isEmpty()) {
+  private void normalizeTaskForSave(Task task) {
+    if (task.getTitle() == null || task.getTitle().trim().isEmpty()) {
       throw new InvalidTaskException("Title must not be empty");
     }
-    if (description == null) {
+    if (task.getDescription() == null) {
       throw new InvalidTaskException("Description must not be null");
     }
-    if (completed == null) {
-      throw new InvalidTaskException("Completed must not be null");
+    if (task.isCompleted() == null) {
+      task.setCompleted(false);
     }
   }
 }

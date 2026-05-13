@@ -1,7 +1,10 @@
 package com.mipt.popikovdmitriy.controller;
 
+import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -13,13 +16,12 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import java.time.Instant;
-import java.util.Map;
+
+import com.mipt.popikovdmitriy.model.CreateTaskRequest;
+import com.mipt.popikovdmitriy.model.Task;
 import com.mipt.popikovdmitriy.scope.PrototypeScopedBean;
 import com.mipt.popikovdmitriy.scope.RequestScopedBean;
 import com.mipt.popikovdmitriy.service.PrototypeBeanService;
-import com.mipt.popikovdmitriy.model.CreateTaskRequest;
-import com.mipt.popikovdmitriy.model.Task;
 import com.mipt.popikovdmitriy.service.TaskService;
 
 import jakarta.validation.Valid;
@@ -27,19 +29,6 @@ import jakarta.validation.constraints.Min;
 
 /**
  * REST controller that exposes CRUD endpoints for task management.
- *
- * <p>
- * All request/response bodies are validated using Jakarta Bean Validation.
- * Endpoints:
- * <ul>
- * <li>{@code POST   /api/tasks} — create a new task</li>
- * <li>{@code GET    /api/tasks/{id}} — retrieve a task by its identifier</li>
- * <li>{@code GET    /api/tasks} — list all tasks</li>
- * <li>{@code PUT    /api/tasks/{id}} — update an existing task</li>
- * <li>{@code DELETE /api/tasks/{id}} — delete a task</li>
- * </ul>
- *
- * @see com.mipt.popikovdmitriy.service.TaskService
  */
 @RestController
 @Validated
@@ -49,47 +38,63 @@ public class TaskController {
   private final TaskService taskService;
   private final RequestScopedBean requestScopedBean;
   private final PrototypeBeanService prototypeBeanService;
+  private final String apiVersion;
 
   public TaskController(TaskService taskService,
                         RequestScopedBean requestScopedBean,
-                        PrototypeBeanService prototypeBeanService) {
+                        PrototypeBeanService prototypeBeanService,
+                        @Value("${app.version}") String apiVersion) {
     this.taskService = taskService;
     this.requestScopedBean = requestScopedBean;
     this.prototypeBeanService = prototypeBeanService;
+    this.apiVersion = apiVersion;
   }
 
   @PostMapping
   public ResponseEntity<Task> createTask(@RequestBody @Valid CreateTaskRequest request) {
-    Task created = taskService.createTask(request.getTitle(),
-        request.getDescription(),
-        request.isCompleted());
-    return ResponseEntity
-        .status(HttpStatus.CREATED)
+    Task created = taskService.createTask(new Task(null, request.getTitle(), request.getDescription(), request.isCompleted()));
+    return ResponseEntity.status(HttpStatus.CREATED)
         .header("Location", "/api/tasks/" + created.getId())
+        .header("X-API-Version", apiVersion)
         .body(created);
   }
 
   @GetMapping("/{id}")
   public ResponseEntity<Task> getTask(@PathVariable @Min(1) Long id) {
-    return ResponseEntity.ok(taskService.getTaskById(id));
+    Task task = taskService.getTaskById(id);
+    return ResponseEntity.ok()
+        .header("X-API-Version", apiVersion)
+        .body(task);
   }
 
   @GetMapping
   public ResponseEntity<List<Task>> getAllTasks() {
-    return ResponseEntity.ok(taskService.getAllTasks());
+    List<Task> tasks = taskService.getAllTasks();
+    return ResponseEntity.ok()
+        .header("X-API-Version", apiVersion)
+        .header("X-Total-Count", String.valueOf(tasks.size()))
+        .body(tasks);
   }
 
   @PutMapping("/{id}")
-  public ResponseEntity<Task> updateTask(@PathVariable @Min(1) Long id, @RequestBody @Valid CreateTaskRequest update) {
-    return ResponseEntity.ok(
-        taskService.updateTask(id, update.getTitle(), update.getDescription(),
-            update.isCompleted()));
+  public ResponseEntity<Task> updateTask(@PathVariable @Min(1) Long id,
+      @RequestBody @Valid CreateTaskRequest update) {
+    Task existing = taskService.getTaskById(id);
+    existing.setTitle(update.getTitle());
+    existing.setDescription(update.getDescription());
+    existing.setCompleted(update.isCompleted());
+    Task updated = taskService.updateTask(existing);
+    return ResponseEntity.ok()
+        .header("X-API-Version", apiVersion)
+        .body(updated);
   }
 
   @DeleteMapping("/{id}")
   public ResponseEntity<Void> deleteTask(@PathVariable @Min(1) Long id) {
     taskService.deleteTaskById(id);
-    return ResponseEntity.noContent().build();
+    return ResponseEntity.noContent()
+        .header("X-API-Version", apiVersion)
+        .build();
   }
 
   @GetMapping("/scope/request")
