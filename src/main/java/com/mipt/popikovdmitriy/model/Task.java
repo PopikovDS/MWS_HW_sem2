@@ -1,88 +1,142 @@
 package com.mipt.popikovdmitriy.model;
 
+import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
-/**
- * Domain model representing a single task in the task management system.
- *
- * <p>
- * Each task has a unique {@code id}, a {@code title}, an optional
- * {@code description}, and a {@code completed} flag indicating whether the task
- * has been finished.</p>
- */
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+
+@Entity
+@Table(name = "tasks")
+@EntityListeners(AuditingEntityListener.class)
 public class Task {
 
-  private Long id;
-  private String title;
-  private String description;
-  private Boolean completed;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-  public Task(Long id, String title, String description, Boolean completed) {
-    this.id = id;
-    this.title = title;
-    this.description = description;
-    this.completed = completed;
-  }
+    @Column(nullable = false, length = 200)
+    private String title;
 
-  public Long getId() {
-    return id;
-  }
+    @Column(nullable = false, length = 1000)
+    private String description;
 
-  public void setId(Long id) {
-    this.id = id;
-  }
+    @Column(nullable = false)
+    private Boolean completed = false;
 
-  public String getTitle() {
-    return title;
-  }
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Priority priority = Priority.MEDIUM;
 
-  public void setTitle(String title) {
-    this.title = title;
-  }
+    @CreatedDate
+    @Column(name = "created_at", updatable = false)
+    private LocalDateTime createdAt;
 
-  public String getDescription() {
-    return description;
-  }
+    @LastModifiedDate
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
 
-  public void setDescription(String description) {
-    this.description = description;
-  }
+    @OneToMany(mappedBy = "task", cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.LAZY)
+    private Set<TaskAttachment> attachments = new HashSet<>();
 
-  public Boolean isCompleted() {
-    return completed;
-  }
-
-  public void setCompleted(Boolean completed) {
-    this.completed = completed;
-  }
-
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) {
-      return true;
+    public Task() {
     }
-    if (o == null || getClass() != o.getClass()) {
-      return false;
+
+    public Task(Long id, String title, String description, Boolean completed) {
+        this.id = id;
+        this.title = title;
+        this.description = description;
+        this.completed = completed != null ? completed : false;
+        this.priority = Priority.MEDIUM;
     }
-    Task task = (Task) o;
-    return Objects.equals(id, task.id)
-        && Objects.equals(completed, task.completed)
-        && Objects.equals(title, task.title)
-        && Objects.equals(description, task.description);
-  }
 
-  @Override
-  public int hashCode() {
-    return Objects.hash(id, title, description, completed);
-  }
+    public Long getId() {
+        return id;
+    }
 
-  @Override
-  public String toString() {
-    return "Task{"
-        + "id=" + id
-        + ", title='" + title + '\''
-        + ", description='" + description + '\''
-        + ", completed=" + completed
-        + '}';
-  }
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public Boolean isCompleted() {
+        return completed;
+    }
+
+    public void setCompleted(Boolean completed) {
+        this.completed = completed;
+    }
+
+    public Priority getPriority() {
+        return priority;
+    }
+
+    public void setPriority(Priority priority) {
+        this.priority = priority;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public Set<TaskAttachment> getAttachments() {
+        return attachments;
+    }
+
+    public void setAttachments(Set<TaskAttachment> attachments) {
+        this.attachments = attachments;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        Task task = (Task) o;
+        return Objects.equals(id, task.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
+
 }

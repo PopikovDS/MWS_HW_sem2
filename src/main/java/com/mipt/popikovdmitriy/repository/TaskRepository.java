@@ -1,30 +1,25 @@
 package com.mipt.popikovdmitriy.repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+
+import com.mipt.popikovdmitriy.model.Priority;
 import com.mipt.popikovdmitriy.model.Task;
 
-/**
- * Abstraction for task persistence operations.
- *
- * <p>
- * Defines the standard CRUD contract that all repository implementations must
- * fulfill. Concrete implementations may store data in memory, in a database, or
- * return pre-configured stub data.</p>
- *
- * @see com.mipt.popikovdmitriy.repository.InMemoryTaskRepository
- * @see com.mipt.popikovdmitriy.repository.StubTaskRepository
- */
-public interface TaskRepository {
+public interface TaskRepository extends JpaRepository<Task, Long> {
 
-  Task create(String title, String description, Boolean completed);
+    List<Task> findByCompleted(Boolean completed);
 
-  Optional<Task> findById(Long id);
+    List<Task> findByCompletedAndPriority(Boolean completed, Priority priority);
 
-  List<Task> findAll();
+    @Query("SELECT t FROM Task t WHERE t.createdAt >= :startDate")
+    List<Task> findTasksCreatedAfter(@Param("startDate") LocalDateTime startDate);
 
-  Task update(Task task);
+    @Query("SELECT t FROM Task t LEFT JOIN FETCH t.attachments")
+    List<Task> findAllWithAttachments();
 
-  boolean deleteById(Long id);
 }

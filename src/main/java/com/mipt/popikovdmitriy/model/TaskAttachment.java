@@ -2,91 +2,105 @@ package com.mipt.popikovdmitriy.model;
 
 import java.time.LocalDateTime;
 
-/**
- * Metadata for an attachment stored on disk and linked to a task.
- */
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+
+@Entity
+@Table(name = "task_attachments")
 public class TaskAttachment {
 
-  private Long id;
-  private Long taskId;
-  private String fileName;
-  private String storedFileName;
-  private String contentType;
-  private long size;
-  private LocalDateTime uploadedAt;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-  public TaskAttachment() {
-  }
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "task_id", nullable = false)
+    private Task task;
 
-  public TaskAttachment(Long id,
-                        Long taskId,
-                        String fileName,
-                        String storedFileName,
-                        String contentType,
-                        long size,
-                        LocalDateTime uploadedAt) {
-    this.id = id;
-    this.taskId = taskId;
-    this.fileName = fileName;
-    this.storedFileName = storedFileName;
-    this.contentType = contentType;
-    this.size = size;
-    this.uploadedAt = uploadedAt;
-  }
+    private String fileName;
+    private String storedFileName;
+    private String contentType;
+    private long size;
+    private LocalDateTime uploadedAt;
 
-  public Long getId() {
-    return id;
-  }
+    public TaskAttachment() {
+    }
 
-  public void setId(Long id) {
-    this.id = id;
-  }
+    public TaskAttachment(Long id,
+            Task task,
+            String fileName,
+            String storedFileName,
+            String contentType,
+            long size,
+            LocalDateTime uploadedAt) {
+        this.id = id;
+        this.task = task;
+        this.fileName = fileName;
+        this.storedFileName = storedFileName;
+        this.contentType = contentType;
+        this.size = size;
+        this.uploadedAt = uploadedAt;
+    }
 
-  public Long getTaskId() {
-    return taskId;
-  }
+    public Long getId() {
+        return id;
+    }
 
-  public void setTaskId(Long taskId) {
-    this.taskId = taskId;
-  }
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-  public String getFileName() {
-    return fileName;
-  }
+    public Task getTask() {
+        return task;
+    }
 
-  public void setFileName(String fileName) {
-    this.fileName = fileName;
-  }
+    public void setTask(Task task) {
+        this.task = task;
+    }
 
-  public String getStoredFileName() {
-    return storedFileName;
-  }
+    public String getFileName() {
+        return fileName;
+    }
 
-  public void setStoredFileName(String storedFileName) {
-    this.storedFileName = storedFileName;
-  }
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
 
-  public String getContentType() {
-    return contentType;
-  }
+    public String getStoredFileName() {
+        return storedFileName;
+    }
 
-  public void setContentType(String contentType) {
-    this.contentType = contentType;
-  }
+    public void setStoredFileName(String storedFileName) {
+        this.storedFileName = storedFileName;
+    }
 
-  public long getSize() {
-    return size;
-  }
+    public String getContentType() {
+        return contentType;
+    }
 
-  public void setSize(long size) {
-    this.size = size;
-  }
+    public void setContentType(String contentType) {
+        this.contentType = contentType;
+    }
 
-  public LocalDateTime getUploadedAt() {
-    return uploadedAt;
-  }
+    public long getSize() {
+        return size;
+    }
 
-  public void setUploadedAt(LocalDateTime uploadedAt) {
-    this.uploadedAt = uploadedAt;
-  }
+    public void setSize(long size) {
+        this.size = size;
+    }
+
+    public LocalDateTime getUploadedAt() {
+        return uploadedAt;
+    }
+
+    public void setUploadedAt(LocalDateTime uploadedAt) {
+        this.uploadedAt = uploadedAt;
+    }
 }

@@ -1,17 +1,9 @@
 package com.mipt.popikovdmitriy.repository;
 
-import java.util.List;
-import java.util.Optional;
+import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.mipt.popikovdmitriy.model.TaskAttachment;
 
-public interface TaskAttachmentRepository {
+public interface TaskAttachmentRepository extends JpaRepository<TaskAttachment, Long> {
 
-  TaskAttachment create(TaskAttachment attachment);
-
-  Optional<TaskAttachment> findById(Long id);
-
-  List<TaskAttachment> findAllByTaskId(Long taskId);
-
-  boolean deleteById(Long id);
 }

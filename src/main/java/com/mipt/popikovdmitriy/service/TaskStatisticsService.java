@@ -1,6 +1,5 @@
 package com.mipt.popikovdmitriy.service;
 
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import com.mipt.popikovdmitriy.repository.TaskRepository;
@@ -8,19 +7,20 @@ import com.mipt.popikovdmitriy.repository.TaskRepository;
 @Service
 public class TaskStatisticsService {
 
-  private final TaskRepository primaryRepository;
-  private final TaskRepository stubRepository;
+    private final TaskRepository repository;
 
-  public TaskStatisticsService(
-      TaskRepository primaryRepository,
-      @Qualifier("stubTaskRepository") TaskRepository stubRepository) {
-    this.primaryRepository = primaryRepository;
-    this.stubRepository = stubRepository;
-  }
+    public TaskStatisticsService(TaskRepository repository) {
+        this.repository = repository;
+    }
 
-  public String compareRepositories() {
-    int primaryCount = primaryRepository.findAll().size();
-    int stubCount = stubRepository.findAll().size();
-    return "primary=" + primaryCount + ", stub=" + stubCount;
-  }
+    public long countAll() {
+        return repository.count();
+    }
+
+    public String compareRepositories() {
+        long primary = repository.count();
+        long stub = 0L; // stub repository removed; return placeholder
+        return "primary=" + primary + ", stub=" + stub;
+    }
+
 }

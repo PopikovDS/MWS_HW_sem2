@@ -6,46 +6,57 @@ import jakarta.validation.constraints.Size;
 
 public class TaskCreateDto {
 
-  @NotBlank(message = "Title must not be blank")
-  @Size(max = 100, message = "Title must be at most 100 characters")
-  private String title;
+    @NotBlank(message = "Title must not be blank")
+    @Size(max = 100, message = "Title must be at most 100 characters")
+    private String title;
 
-  @NotNull(message = "Description must not be null")
-  @Size(max = 500, message = "Description must be at most 500 characters")
-  private String description;
+    @NotNull(message = "Description must not be null")
+    @Size(max = 500, message = "Description must be at most 500 characters")
+    private String description;
 
-  private Boolean completed = false;
+    private Boolean completed = false;
 
-  public TaskCreateDto() {
-  }
+    private String priority = "MEDIUM";
 
-  public TaskCreateDto(String title, String description, Boolean completed) {
-    this.title = title;
-    this.description = description;
-    this.completed = completed;
-  }
+    public TaskCreateDto() {
+    }
 
-  public String getTitle() {
-    return title;
-  }
+    public TaskCreateDto(String title, String description, Boolean completed) {
+        this.title = title;
+        this.description = description;
+        this.completed = completed;
+        this.priority = "MEDIUM";
+    }
 
-  public void setTitle(String title) {
-    this.title = title;
-  }
+    public String getTitle() {
+        return title;
+    }
 
-  public String getDescription() {
-    return description;
-  }
+    public void setTitle(String title) {
+        this.title = title;
+    }
 
-  public void setDescription(String description) {
-    this.description = description;
-  }
+    public String getDescription() {
+        return description;
+    }
 
-  public Boolean getCompleted() {
-    return completed;
-  }
+    public void setDescription(String description) {
+        this.description = description;
+    }
 
-  public void setCompleted(Boolean completed) {
-    this.completed = completed;
-  }
+    public Boolean getCompleted() {
+        return completed;
+    }
+
+    public void setCompleted(Boolean completed) {
+        this.completed = completed;
+    }
+
+    public String getPriority() {
+        return priority;
+    }
+
+    public void setPriority(String priority) {
+        this.priority = priority;
+    }
 }
